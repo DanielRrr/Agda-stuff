@@ -1,4 +1,4 @@
-> type SolveResult =
+type SolveResult =
     None
   | Linear of float
   | Quadratic of float*float
