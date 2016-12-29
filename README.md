@@ -1,2 +1,0 @@
-# FSharpStudies
-FSharpExer-s
