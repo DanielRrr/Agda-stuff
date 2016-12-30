@@ -174,3 +174,40 @@ module Sort (A : Set)(_<_ : A → A → Bool) where
   sort : List A → List A
   sort Nil = Nil
   sort (Cons x xs)  = insert x (sort xs)
+
+record Point : Set where
+  field x : Nat
+        y : Nat
+
+mkPoint : Nat → Nat → Point
+mkPoint a b = record { x = a; y = b }
+
+getX : Point → Nat
+getX = Point.x
+
+abs² : Point → Nat
+abs² p = let open Point p in ((x * x) + (y * y))
+
+getY : Point → Nat
+getY = Point.y
+
+record Monad (M : Set → Set) : Set₁ where
+  field
+    return : {A : Set} → A → M A
+    _>>=_ : {A B : Set} → M A → (A → M B) → M B
+
+  mapM : {A B : Set} → (A → M B) → List A → M (List B)
+  mapM f Nil = return Nil
+  mapM f (Cons x xs) = f x >>= \y → mapM f xs >>= \ys → return (Cons y ys)
+
+Matrix : Set → Nat → Nat → Set
+Matrix A n m = Vec (Vec A n) m
+
+vec : {n : Nat}{A : Set} → A → Vec A n
+vec {zero} x = []
+vec {succ n} x = x :: vec {n} x
+
+infixl 90 _$_
+_$_ : {n : Nat}{A B : Set} → (A → B) → Vec A n → Vec B n
+f $ [] = []
+f $ (x :: xs) = f x :: (f $ xs)
