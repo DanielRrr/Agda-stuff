@@ -208,6 +208,11 @@ vec {zero} x = []
 vec {succ n} x = x :: vec {n} x
 
 infixl 90 _$_
-_$_ : {n : Nat}{A B : Set} → (A → B) → Vec A n → Vec B n
-f $ [] = []
-f $ (x :: xs) = f x :: (f $ xs)
+infixl 90 _::_
+_$_ : {n : Nat}{A B : Set} → Vec (A → B) n → Vec A n → Vec B n
+[] $ xs = []
+x :: fs $ (x₁ :: xs) = x x₁ :: (fs $ xs)
+
+transpose : ∀ {A m n} → Matrix A m n → Matrix A n m
+transpose [] = vec []
+transpose (xs :: xss) = vmap (λ x xs → x :: xs) xs $ transpose xss
