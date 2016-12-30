@@ -216,3 +216,15 @@ x :: fs $ (x₁ :: xs) = x x₁ :: (fs $ xs)
 transpose : ∀ {A m n} → Matrix A m n → Matrix A n m
 transpose [] = vec []
 transpose (xs :: xss) = vmap (λ x xs → x :: xs) xs $ transpose xss
+
+⊆-refl : {A : Set}{xs : List A} → xs ⊆ xs
+⊆-refl {A} {Nil} = stop
+⊆-refl {A} {Cons x xs} = keep ⊆-refl
+
+⊆-trans : {A : Set}{xs ys zs : List A} → xs ⊆ ys → ys ⊆ zs → xs ⊆ zs
+⊆-trans stop stop = stop
+⊆-trans stop (drop q) = drop q
+⊆-trans (drop p) (drop q) = drop (⊆-trans (drop p) q)
+⊆-trans (drop p) (keep q) = drop (⊆-trans p q)
+⊆-trans (keep p) (drop q) = drop (⊆-trans (keep p) q)
+⊆-trans (keep p) (keep q) = keep (⊆-trans p q)
