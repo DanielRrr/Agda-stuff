@@ -106,3 +106,43 @@ index (tl p) = suc (index p)
 data Lookup {A : Set}(xs : List A) : ℕ → Set where
   inside : (x : A) (p : x ∈ xs) → Lookup xs (index p)
   outside : (m : ℕ) → Lookup xs (length xs + m)
+
+infixr 30 _⇒_
+data Type : Set where
+  ₁ : Type
+  _⇒_ : Type → Type → Type
+
+data Equal? : Type → Type → Set  where
+  yes : ∀ {τ} → Equal? τ τ
+  no : ∀ {σ τ} → Equal? σ τ
+
+_=?=_ : (σ τ : Type) → Equal? σ τ
+₁ =?= ₁  = yes
+₁ =?= (_ ⇒ _) = no
+(_ ⇒ _) =?= ₁ = no
+(σ₁ ⇒ τ₁) =?= (σ₂ ⇒ τ₂) with σ₁ =?= σ₂ | τ₁ =?= τ₂
+(σ ⇒ τ) =?= (.σ ⇒ .τ) | yes | yes = yes
+(σ₁ ⇒ τ₁) =?= (σ₂ ⇒ τ₂) | _ | _ = no
+
+infixl 80 _$$_
+
+data Raw : Set where
+  var  : ℕ → Raw
+  _$$_ : Raw → Raw → Raw
+  lam  : Type → Raw → Raw
+
+Ctx = List Type
+
+data Term (Γ : Ctx) : Type → Set where
+  var  : ∀ {τ} → τ ∈ Γ → Term Γ τ
+  _$$_ : ∀ {σ τ} → Term Γ (σ ⇒ τ) → Term Γ σ → Term Γ τ
+  lam  : ∀ σ {τ} → Term (σ ∷ Γ) τ → Term Γ (σ ⇒ τ)
+
+wear : ∀ {Γ τ}  → Term Γ τ → Raw
+wear (var x) = var (index x)
+wear (t $$ y) = wear t $$ wear y
+wear (lam σ t) = lam σ (wear t)
+
+data Infer (Γ : Ctx) : Raw → Set where
+  ok      : (τ : Type)(t : Term Γ τ) → Infer Γ (wear t)
+  rubbish : {e : Raw} → Infer Γ e
