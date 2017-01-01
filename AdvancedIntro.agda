@@ -95,6 +95,38 @@ length (Cons x xs) = succ (length xs)
 data _==_ {A : Set}(x : A) : A → Set where
   refl : x == x
 
+sym : {A : Set}{a b : A} → a == b → b == a
+sym refl = refl
+
+trans : {A : Set}{a b c : A} → a == b → b == c → a == c
+trans refl refl = refl
+
+cong : {A B : Set}{a b : A} → (f : A → B) → a == b → f a == f b
+cong f refl = refl
+
++-assoc : ∀ a b c → (a + b) + c == a + (b + c)
++-assoc zero b c = refl
++-assoc (succ a) b c = cong succ (+-assoc a b c)
+
+lemma-+-zero : ∀ a → a + zero == a
+lemma-+-zero zero = refl
+lemma-+-zero (succ a) = cong succ (lemma-+-zero a)
+
+lemma-+-succ : ∀ a b → succ a + b == a + succ b
+lemma-+-succ zero b = refl
+lemma-+-succ (succ a) b = cong succ (lemma-+-succ a b)
+
+infix 5 _∼_
+_∼_ = trans
+
+infix 4 _==_
+infixr 40 _+_
+infixr 60 _*_
+
++-comm : ∀ a b → a + b == b + a
++-comm zero b = sym (lemma-+-zero b)
++-comm (succ a) b = cong succ (+-comm a b) ∼ lemma-+-succ b a
+
 data _≤_ : Nat → Nat → Set where
   leq-zero : {n : Nat} → zero ≤ n
   leq-succ : {m n : Nat} → m ≤ n → succ m ≤ succ n
@@ -107,6 +139,11 @@ min : Nat → Nat → Nat
 min x y with x < y
 min x y | true = x
 min x y | false = y
+
+map : {A B : Set} → (A → B) → List A → List B
+map f Nil = Nil
+map f (Cons x xs) = Cons (f x) (map f xs)
+
 
 filter : {A : Set} → (A → Bool) → List A → List A
 filter p Nil = Nil
@@ -142,9 +179,6 @@ lem-filter p Nil = stop
 lem-filter p (Cons x xs) with p x
 ... | true = keep (lem-filter p xs)
 ... | false = drop (lem-filter p xs)
-
-infix 25 _==_
-infixr 40 _+_
 
 lem-plus-zero : (n : Nat) → n + zero == n
 lem-plus-zero zero = refl
