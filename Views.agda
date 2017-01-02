@@ -32,6 +32,8 @@ module Function where
   s-comb  = λ f g x → (f x)(g x)
   
   infixr 60 _×_
+  data _×_ (A B : Set) : Set where
+    _,_ : A → B → A × B
 
   uncurry : {A B C : Set} → (A → B → C) → A × B → C
   uncurry f (x , y) = f x y
