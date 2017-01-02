@@ -27,6 +27,29 @@ module Function where
 
   const : ∀ {α β} → {A : Set α}{B : Set β} → (A → B → A)
   const = λ x y → x
+  
+  infixr 60 _×_
+
+  uncurry : {A B C : Set} → (A → B → C) → A × B → C
+  uncurry f (x , y) = f x y
+
+  curry : {A B C : Set} → (A × B → C) → A → B → C
+  curry f x y = f (x , y)
+
+  π₁ : {A B : Set} → (A × B) → A
+  π₁ (x , y) = x
+
+  π₂ : {A B : Set} → (A × B) → B
+  π₂ (x , y) = y
+
+  uniProd : {A B C : Set} → (A → B) → (A → C) → A → B × C
+  uniProd f g x  = f x , g x
+
+  square : {A B C D : Set} → (A → C) → (B → D) → A × B → C × D
+  square f g (x , y) = (f x , g y)
+
+  swap : {A B : Set} → A × B → B × A
+  swap (x , y) = (y , x)
 
 open Function public
   
