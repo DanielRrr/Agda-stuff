@@ -168,6 +168,20 @@ _=?=_ : (σ τ : Type) → Equal? σ τ
 (σ ⇒ τ) =?= (.σ ⇒ .τ) | yes | yes = yes
 (σ₁ ⇒ τ₁) =?= (σ₂ ⇒ τ₂) | _ | _ = no
 
+data NotEqual? : Type → Type → Set where
+  yes : ∀ {σ τ} → NotEqual? σ τ
+  no : ∀ {σ} → NotEqual? σ σ
+
+_≠_ : (σ τ : Type) → NotEqual? σ τ 
+₁ ≠ ₁ = no
+₁ ≠ (τ ⇒ τ₁) = yes
+(σ ⇒ σ₁) ≠ ₁ = yes
+(σ₁ ⇒ τ₁) ≠ (σ₂ ⇒ τ₂) with σ₁ ≠ σ₂ | τ₁ ≠ τ₂
+(σ₁ ⇒ τ₁) ≠ (σ₂ ⇒ τ₂) | yes  | yes = yes
+(σ ⇒ τ) ≠ (σ₁ ⇒ τ₁)   | yes  | _   = _
+(σ ⇒ τ) ≠ (σ₁ ⇒ τ₁)   | _    | yes = _
+(σ ⇒ τ) ≠ (σ₁ ⇒ τ₁)   | no   | no  = no
+
 infixl 80 _$$_
 
 data Raw : Set where
