@@ -56,6 +56,22 @@ module Function where
   swap : {A B : Set} → A × B → B × A
   swap (x , y) = (y , x)
 
+  dublicate : {A : Set} → A → A × A
+  dublicate x = (x , x)
+
+  data _⊕_ (A B : Set) : Set where
+    in₁ : A → A ⊕ B
+    in₂ : B → A ⊕ B
+
+  infixr 50 _⊕_
+
+  [_||_] : {A B C : Set} → (A → C) → (B → C) → A ⊕ B → C
+  [ f || g ] (in₁ x) = f x
+  [ f || g ] (in₂ y) = g y
+
+  prodCoProd : {A B : Set} → (A × B) → (A ⊕ B)
+  prodCoProd (x , y) = in₁ x
+  
 open Function public
   
 data Parity : ℕ → Set where
