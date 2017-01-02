@@ -28,6 +28,9 @@ module Function where
   const : ∀ {α β} → {A : Set α}{B : Set β} → (A → B → A)
   const = λ x y → x
   
+  s-comb : ∀ {α β γ} → {A : Set α}{B : Set β}{C : Set γ} → (A → (B → C)) → (A → B) → (A → C)
+  s-comb  = λ f g x → (f x)(g x)
+  
   infixr 60 _×_
 
   uncurry : {A B C : Set} → (A → B → C) → A × B → C
