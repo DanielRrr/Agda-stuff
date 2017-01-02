@@ -145,4 +145,27 @@ wear (lam σ t) = lam σ (wear t)
 
 data Infer (Γ : Ctx) : Raw → Set where
   ok      : (τ : Type)(t : Term Γ τ) → Infer Γ (wear t)
-  rubbish : {e : Raw} → Infer Γ e
+  bad     : {e : Raw} → Infer Γ e
+
+_!_ : {A : Set}(xs : List A)(n : ℕ) -> Lookup xs n
+[] ! n = outside n
+(x ∷ xs) ! zero = inside x hd
+(x ∷ xs) ! suc n with xs ! n
+(x ∷ xs) ! suc .(index p) | inside y p = inside y (tl p)
+(x ∷ xs) ! suc .(length xs + n) | outside n = outside n
+
+infer : (Γ : Ctx)(e : Raw) -> Infer Γ e
+infer Γ (var n) with Γ ! n
+infer Γ (var .(length Γ + n)) | outside n = bad
+infer Γ (var .(index x)) | inside σ x = ok σ (var x)
+infer Γ (e1 $$ e2) with infer Γ e1
+infer Γ (e1 $$ e2) | bad = bad
+infer Γ (.(wear t1) $$ e2) | ok ₁ t1 = bad
+infer Γ (.(wear t1) $$ e2) | ok (σ ⇒ τ) t1 with infer Γ e2
+infer Γ (.(wear t1) $$ e2) | ok (σ ⇒ τ) t1 | bad = bad
+infer Γ (.(wear t1) $$ .(wear t2)) | ok (σ ⇒ τ) t1 | ok σ’ t2 with σ =?= σ’
+infer Γ (.(wear t1) $$ .(wear t2)) | ok (σ ⇒ τ) t1 | ok .σ t2 | yes = ok τ (t1 $$ t2)
+infer Γ (.(wear t1) $$ .(wear t2)) | ok (σ ⇒ τ) t1 | ok σ’ t2 | no = bad
+infer Γ (lam σ e) with infer (σ ∷ Γ) e
+infer Γ (lam σ .(wear t)) | ok τ t = ok (σ ⇒ τ) (lam σ t)
+infer Γ (lam σ e) | bad = bad
