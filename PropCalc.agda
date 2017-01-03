@@ -41,8 +41,8 @@ P ⇔ Q = (P ⇒ Q) ∧ (Q ⇒ P)
 
 infixr 0 _⇔_
 
-K : {P Q : Prop} → P ⇒ Q ⇒ P
-K p q = p
+const : {P Q : Prop} → P ⇒ Q ⇒ P
+const p q = p
 
 S : {P Q R : Prop} → (P ⇒ Q ⇒ R) ⇒ (P ⇒ Q) ⇒ P ⇒ R
 S x y z = (x z) (y z)
@@ -52,6 +52,9 @@ I p = p
 
 flip : {P Q R : Prop} → (P ⇒ Q ⇒ R) ⇒ Q ⇒ P ⇒ R
 flip = λ x y z → x z y
+
+dubl : {P Q : Prop} → (P ⇒ P ⇒ Q) ⇒ P ⇒ Q
+dubl p⇒p⇒q p = p⇒p⇒q p p
 
 infixr 9 _∘_
 _∘_ : {P Q R : Prop} → (Q ⇒ R) ⇒ (P ⇒ Q) ⇒ P ⇒ R
@@ -67,8 +70,14 @@ residual₁ p⇒q⇒r p∧q = p⇒q⇒r (elim∧₁ p∧q) (elim∧₂ p∧q)
 residual₂ : {P Q R : Prop} → (P ∧ Q ⇒ R) ⇒ P ⇒ Q ⇒ R
 residual₂ p∧q⇒r p q = p∧q⇒r (p , q)
 
-∧-comm : {P Q : Prop} → P ∧ Q ⇒ Q ∧ P
-∧-comm (x , y) =  (y , x)
+∧-comm₁ : {P Q : Prop} → P ∧ Q ⇒ Q ∧ P
+∧-comm₁ (x , y) = (y , x)
+
+∧-comm₂ : {P Q : Prop} → Q ∧ P ⇒ P ∧ Q
+∧-comm₂ (x , y) = (y , x)
+
+∧-comm : {P Q : Prop} → P ∧ Q ⇔ Q ∧ P
+∧-comm = (∧-comm₁ , ∧-comm₂)
 
 ∧-assoc₁ : {P Q R : Prop} → (P ∧ Q) ∧ R ⇒ P ∧ (Q ∧ R)
 ∧-assoc₁ ((x , y) , z) = (x , (y , z))
@@ -81,3 +90,18 @@ residual₂ p∧q⇒r p q = p∧q⇒r (p , q)
 
 ∧-apply : {P Q : Prop} → P ∧ (P ⇒ Q) ⇒ Q
 ∧-apply (p , p⇒q)  = elim∧₂ (p , p⇒q) (elim∧₁ (p , p⇒q))
+
+apply-∧ : {P Q : Prop} → (P ⇒ Q) ∧ P ⇒ Q
+apply-∧ (p⇒q , p) = elim∧₁ (p⇒q , p) (elim∧₂ (p⇒q , p))
+
+imdepotency₁ : {P : Prop} → (P ∧ P) ⇒ P
+imdepotency₁ p∧p = elim∧₁ p∧p
+
+imdepotency₂ : {P : Prop} → P ⇒ (P ∧ P)
+imdepotency₂ p = (p , p)
+
+imdepotency : {P : Prop} → (P ∧ P) ⇔ P
+imdepotency = (imdepotency₁ , imdepotency₂)
+
+transitivity : {P Q R : Prop} → (P ⇒ Q) ∧ (Q ⇒ R) ⇒ P ⇒ R
+transitivity ((p⇒q) , (q⇒r)) p = elim∧₂ ((p⇒q) , (q⇒r)) (elim∧₁ ((p⇒q) , (q⇒r)) p)
