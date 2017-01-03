@@ -66,3 +66,15 @@ residual₁ p⇒q⇒r p∧q = p⇒q⇒r (elim∧₁ p∧q) (elim∧₂ p∧q)
 
 residual₂ : {P Q R : Prop} → (P ∧ Q ⇒ R) ⇒ P ⇒ Q ⇒ R
 residual₂ p∧q⇒r p q = p∧q⇒r (p , q)
+
+∧-comm : {P Q : Prop} → P ∧ Q ⇒ Q ∧ P
+∧-comm (x , y) =  (y , x)
+
+∧-assoc₁ : {P Q R : Prop} → (P ∧ Q) ∧ R ⇒ P ∧ (Q ∧ R)
+∧-assoc₁ ((x , y) , z) = (x , (y , z))
+
+∧-assoc₂ : {P Q R : Prop} → P ∧ (Q ∧ R) ⇒ (P ∧ Q) ∧ R
+∧-assoc₂ (x , (y , z)) = ((x , y) , z)
+
+∧-assoc : {P Q R : Prop} → (P ∧ Q) ∧ R ⇔ P ∧ (Q ∧ R)
+∧-assoc = (∧-assoc₁ , ∧-assoc₂)
