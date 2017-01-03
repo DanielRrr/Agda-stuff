@@ -78,3 +78,6 @@ residual₂ p∧q⇒r p q = p∧q⇒r (p , q)
 
 ∧-assoc : {P Q R : Prop} → (P ∧ Q) ∧ R ⇔ P ∧ (Q ∧ R)
 ∧-assoc = (∧-assoc₁ , ∧-assoc₂)
+
+∧-apply : {P Q : Prop} → P ∧ (P ⇒ Q) ⇒ Q
+∧-apply (p , p⇒q)  = elim∧₂ (p , p⇒q) (elim∧₁ (p , p⇒q))
