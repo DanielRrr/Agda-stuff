@@ -117,6 +117,19 @@ v-comm₂ (intro∨₂ x) = intro∨₁ x
 ∨-comm : {P Q : Prop} → (P ∨ Q) ⇔ (Q ∨ P)
 ∨-comm = (∨-comm₁ , v-comm₂)
 
+∨-assoc₁ : {P Q R : Prop} → P ∨ (Q ∨ R) ⇒ (P ∨ Q) ∨ R
+∨-assoc₁ (intro∨₁ x) = intro∨₁ (intro∨₁ x)
+∨-assoc₁ (intro∨₂ (intro∨₁ x)) = intro∨₁ (intro∨₂ x)
+∨-assoc₁ (intro∨₂ (intro∨₂ x)) = intro∨₂ x
+
+∨-assoc₂ : {P Q R : Prop} → (P ∨ Q) ∨ R ⇒ P ∨ (Q ∨ R)
+∨-assoc₂ (intro∨₁ (intro∨₁ x)) = intro∨₁ x
+∨-assoc₂ (intro∨₁ (intro∨₂ x)) = intro∨₂ (intro∨₁ x)
+∨-assoc₂ (intro∨₂ x) = intro∨₂ (intro∨₂ x)
+
+∨-assoc : {P Q R : Prop} → P ∨ (Q ∨ R) ⇔ (P ∨ Q) ∨ R
+∨-assoc = (∨-assoc₁ , ∨-assoc₂)
+
 data K (A : Prop) : Prop where
   Known : A ⇒ K A
 
