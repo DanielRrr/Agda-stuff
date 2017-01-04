@@ -130,6 +130,24 @@ v-comm₂ (intro∨₂ x) = intro∨₁ x
 ∨-assoc : {P Q R : Prop} → P ∨ (Q ∨ R) ⇔ (P ∨ Q) ∨ R
 ∨-assoc = (∨-assoc₁ , ∨-assoc₂)
 
+deMorgan : {A B : Prop} → ¬(A ∨ B) ⇒ ((¬ A) ∧ (¬ B))  
+deMorgan = (λ f → (λ x → f (intro∨₁ x)) , (λ x → f (intro∨₂ x)))
+
+contradiction : {A B : Prop} → A ⇒ (¬ A ⇒ B)
+contradiction x ¬x = elim⊥(¬x x)
+
+contraposition : {A B : Prop} → (A ⇒ B) ⇒ (¬ B ⇒ ¬ A)
+contraposition = flip _∘_
+
+contraposition¬ : {A B : Prop} → (A ⇒ ¬ B) ⇒ (B ⇒ ¬ A)
+contraposition¬ = flip
+
+double : {A : Prop} → A ⇒ ¬ (¬ A)
+double = contradiction
+
+brower : {A : Prop} → ¬ (¬ (¬ A)) ⇒ ¬ A
+brower f = f ∘ contradiction
+
 data K (A : Prop) : Prop where
   Known : A ⇒ K A
 
@@ -146,3 +164,17 @@ hold₁ (Known x) = Known (Known x)
 
 hold₂ : {A : Prop} → ¬(K A) ⇒ K (¬ (K A))
 hold₂ x = Known x
+
+IELTheorem₁ : {A : Prop} → K A ⇒ ¬ (¬ A)
+IELTheorem₁ (Known x) = double x
+
+IELTheorem₂ : {A : Prop} → ¬ A ⇒ ¬ (K A)
+IELTheorem₂ f (Known x) = f x
+
+spike : {A : Prop} → K A ⇒ A
+spike (Known x) = x
+IELTheorem₃ : {A : Prop} → ¬ (¬ (K A ⇒ A))
+IELTheorem₃ f = f spike
+
+IELTheorem₄ : {A : Prop} → ¬ (K A ∧ ¬ A)
+IELTheorem₄ (Known x , x₁) = x₁ x
