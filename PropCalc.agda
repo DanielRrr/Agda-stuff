@@ -105,3 +105,20 @@ imdepotency = (imdepotency₁ , imdepotency₂)
 
 transitivity : {P Q R : Prop} → (P ⇒ Q) ∧ (Q ⇒ R) ⇒ P ⇒ R
 transitivity ((p⇒q) , (q⇒r)) p = elim∧₂ ((p⇒q) , (q⇒r)) (elim∧₁ ((p⇒q) , (q⇒r)) p)
+
+data K (A : Prop) : Prop where
+  Known : A ⇒ K A
+
+postulate consist : ¬ (K ⊥)
+
+distr : {A B : Prop} → K (A ⇒ B) ⇒ K A ⇒ K B
+distr (Known f) (Known x) = (Known (f x))
+
+andK : {A B : Prop} → K (A ∧ B) ⇒ (K A ∧ K B)
+andK (Known (a , b)) = (Known (elim∧₁ (a , b)), Known (elim∧₂ (a , b)))
+
+hold₁ : {A : Prop} → K A ⇒ K (K A)
+hold₁ (Known x) = Known (Known x)
+
+hold₂ : {A : Prop} → ¬(K A) ⇒ K (¬ (K A))
+hold₂ x = Known x
