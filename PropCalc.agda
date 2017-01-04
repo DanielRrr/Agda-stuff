@@ -106,6 +106,17 @@ imdepotency = (imdepotency₁ , imdepotency₂)
 transitivity : {P Q R : Prop} → (P ⇒ Q) ∧ (Q ⇒ R) ⇒ P ⇒ R
 transitivity ((p⇒q) , (q⇒r)) p = elim∧₂ ((p⇒q) , (q⇒r)) (elim∧₁ ((p⇒q) , (q⇒r)) p)
 
+∨-comm₁ : {P Q : Prop} → (P ∨ Q) ⇒ (Q ∨ P)
+∨-comm₁ (intro∨₁ p) = intro∨₂ p
+∨-comm₁ (intro∨₂ q) = intro∨₁ q
+
+v-comm₂ : {P Q : Prop} → (Q ∨ P) ⇒ (P ∨ Q)
+v-comm₂ (intro∨₁ x) = intro∨₂ x
+v-comm₂ (intro∨₂ x) = intro∨₁ x
+
+∨-comm : {P Q : Prop} → (P ∨ Q) ⇔ (Q ∨ P)
+∨-comm = (∨-comm₁ , v-comm₂)
+
 data K (A : Prop) : Prop where
   Known : A ⇒ K A
 
