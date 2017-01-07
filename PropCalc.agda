@@ -194,3 +194,15 @@ IELTheorem₄ (Known x , x₁) = x₁ x
 
 ∘-preserveK₁ : {A B C : Prop} → (K (A ⇒ B) ⇒ K ((B ⇒ C) ⇒ (A ⇒ C))) ⇒ (K A ⇒ K B) ⇒ (K B ⇒ K C) ⇒ K A ⇒ K C
 ∘-preserveK₁ f g h x = h (g x)
+
+1-to-postulate : {A : Prop} → K A ⇒ (¬ (¬ A)) ⇒ ¬ (K ⊥)
+1-to-postulate (Known x) f (Known x₁) = x₁
+
+2-to-postulate : {A : Prop} → ¬ A ⇒ (¬ (K A)) ⇒ (¬ (K ⊥))
+2-to-postulate x f (Known x₁) = x₁
+
+3-to-postulate : {A : Prop} → ¬ (¬ (K A ⇒ A)) ⇒ (¬ (K ⊥))
+3-to-postulate f (Known x) = x
+
+4-to-postulate : {A : Prop} → ¬ (K A ∧ ¬ A) ⇒ (¬ (K ⊥))
+4-to-postulate f (Known x) = x
