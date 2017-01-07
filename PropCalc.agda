@@ -188,3 +188,9 @@ IELTheorem₃ f = f spike
 
 IELTheorem₄ : {A : Prop} → ¬ (K A ∧ ¬ A)
 IELTheorem₄ (Known x , x₁) = x₁ x
+
+∘-preserveK : {A B C : Prop} → K ((A ⇒ B) ⇒ (B ⇒ C) ⇒ A ⇒ C) ⇒ (K (A ⇒ B) ⇒ K ((B ⇒ C) ⇒ (A ⇒ C)))
+∘-preserveK = distr
+
+∘-preserveK₁ : {A B C : Prop} → (K (A ⇒ B) ⇒ K ((B ⇒ C) ⇒ (A ⇒ C))) ⇒ (K A ⇒ K B) ⇒ (K B ⇒ K C) ⇒ K A ⇒ K C
+∘-preserveK₁ f g h x = h (g x)
