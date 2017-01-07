@@ -130,6 +130,16 @@ v-comm₂ (intro∨₂ x) = intro∨₁ x
 ∨-assoc : {P Q R : Prop} → P ∨ (Q ∨ R) ⇔ (P ∨ Q) ∨ R
 ∨-assoc = (∨-assoc₁ , ∨-assoc₂)
 
+imdepotency-∨₁ : {P : Prop} → P ⇒ P ∨ P
+imdepotency-∨₁ p = intro∨₁ p
+
+imdepotency-∨₂ : {P : Prop} → P ∨ P ⇒ P
+imdepotency-∨₂ (intro∨₁ x) = x
+imdepotency-∨₂ (intro∨₂ x) = x
+
+imdepotency-∨ : {P : Prop} → P ⇔ P ∨ P
+imdepotency-∨ = (imdepotency-∨₁ , imdepotency-∨₂)
+
 deMorgan : {A B : Prop} → ¬(A ∨ B) ⇒ ((¬ A) ∧ (¬ B))  
 deMorgan = (λ f → (λ x → f (intro∨₁ x)) , (λ x → f (intro∨₂ x)))
 
