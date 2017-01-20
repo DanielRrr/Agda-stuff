@@ -69,3 +69,54 @@ record Monad (F : Set → Set) : Set₁ where
     ;_<*>_ = λ ff fs → ff >>= λ f → fs >>= λ s → return (f s)
     }
 open Monad {{...}} public
+
+_+_ : ℕ → ℕ → ℕ
+Z + b = b
+S a + b = S (a + b)
+
+tail : ∀ {n A} → Vector A (S n) → Vector A n
+tail (x :: x₁) = x₁
+
+record Monoid (A : Set) : Set where
+  infixr 4 _●_
+  field
+    ε : A
+    _●_ : A → A → A
+  monoidApplicative : Applicative λ _ → A
+  monoidApplicative = record
+    { pure = λ _ → ε
+    ; _<*>_ = _●_
+    }
+open Monoid {{...}} public
+
+instance
+  natMonoid : Monoid ℕ
+  natMonoid = record { ε = Z; _●_ = _+_}
+
+infix 4 _≡_
+data _≡_ {A : Set}(x : A) : A → Set where
+  refl : x ≡ x
+
+cong : {A B : Set}{a b : A} → (f : A → B) → a ≡ b → f a ≡ f b
+cong f refl = refl
+
+record MonoidSatisfies A {{M : Monoid A}} : Set where
+  field
+    leftOne  : (a : A)     → (ε ● a) ≡ a
+    rightOne : (a : A)     → (a ● ε) ≡ a
+    assoc    : (a b c : A) → ((a ● b) ● c) ≡ (a ● (b ● c))
+open MonoidSatisfies {{...}} public
+
+leftOneNat : (n : ℕ) → (Z + n) ≡ n
+leftOneNat n = refl
+
+rightOneNat : (n : ℕ) → (n + Z) ≡ n
+rightOneNat Z = refl
+rightOneNat (S n) = cong S (rightOneNat n)
+
++-assoc : ∀ a b c → (a + b) + c ≡ a + (b + c)
++-assoc Z y z = refl
++-assoc (S x) y z = cong S (+-assoc x y z)
+
+NatMonoidSatisfies : MonoidSatisfies ℕ
+NatMonoidSatisfies = record {leftOne = leftOneNat; rightOne = rightOneNat; assoc = +-assoc}
