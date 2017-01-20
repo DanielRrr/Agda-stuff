@@ -223,3 +223,20 @@ open Applicative {{...}} public
 
 epistemicFunctor : {A : Prop} → Applicative λ A → K A
 epistemicFunctor = record {pure = Known; _<*>_ = distr}
+
+record Monad (F : Set → Set) : Set₁ where
+  field
+    return : ∀ {A} → A → F A
+    _>>=_  : ∀ {A B} → F A → (A → F B) → F B
+  monadApplicative : Applicative F
+  monadApplicative = record
+    {pure  = return
+    ;_<*>_ = λ ff fs → ff >>= λ f → fs >>= λ s → return (f s)
+    }
+open Monad {{...}} public
+
+monadKnown : {A B : Prop} → K A ⇒ (A ⇒ K B) ⇒ K B
+monadKnown (Known x) f = f x
+
+epistemicMonad : {A : Prop} → Monad λ A → K A
+epistemicMonad = record {return = Known; _>>=_ = monadKnown}
