@@ -206,3 +206,20 @@ IELTheorem₄ (Known x , x₁) = x₁ x
 
 4-to-postulate : {A : Prop} → ¬ (K A ∧ ¬ A) ⇒ (¬ (K ⊥))
 4-to-postulate f (Known x) = x
+
+record EndoFunctor (F : Set → Set) : Set₁ where
+  field
+    fmap : ∀ {A B} → (A → B) → F A → F B
+open EndoFunctor {{...}} public
+
+record Applicative (F : Set → Set) : Set₁ where
+  infixl 2 _<*>_
+  field
+    pure : ∀ {A} → A → F A
+    _<*>_ : ∀ {A B} → F (A → B) → F A → F B
+  applicativeEndoFunctor : EndoFunctor F
+  applicativeEndoFunctor = record {fmap = _<*>_ ∘ pure}
+open Applicative {{...}} public
+
+epistemicFunctor : {A : Prop} → Applicative λ A → K A
+epistemicFunctor = record {pure = Known; _<*>_ = distr}
