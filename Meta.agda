@@ -120,3 +120,29 @@ rightOneNat (S n) = cong S (rightOneNat n)
 
 NatMonoidSatisfies : MonoidSatisfies ℕ
 NatMonoidSatisfies = record {leftOne = leftOneNat; rightOne = rightOneNat; assoc = +-assoc}
+
+_++_ : {A : Set} → List A → List A → List A
+Nil ++ y = y
+Cons x x₁ ++ y = Cons x (x₁ ++ y)
+
+instance
+  monoidList : {A : Set} → Monoid (List A)
+  monoidList = record {ε = Nil; _●_ = _++_}
+
+addNilLeft : {A : Set}(xs : List A) → Nil ++ xs ≡ xs
+addNilLeft xs = refl
+
+addNilRight : {A : Set}(xs : List A) → xs ++ Nil ≡ xs
+addNilRight Nil = refl
+addNilRight (Cons x xs) = cong (Cons x) (addNilRight xs)
+
+++-assoc : {A : Set}(xs ys zs : List A) → (xs ++ ys) ++ zs ≡ xs ++ (ys ++ zs)
+++-assoc Nil ys zs = refl
+++-assoc (Cons x xs) ys zs = cong (Cons x) (++-assoc xs ys zs)
+
+ListMonoidSatisfies : {A : Set} → MonoidSatisfies (List A)
+ListMonoidSatisfies =
+  record
+  { leftOne = addNilLeft
+  ; rightOne = addNilRight
+  ; assoc = ++-assoc }
