@@ -6,11 +6,6 @@ Prop = Set
 data ⊤ : Prop where
   true : ⊤
 
-data ⊥ : Prop where
-
-elim⊥ : {A : Prop} → ⊥ → A
-elim⊥()
-
 infixr 0 _⇒_
 _⇒_ : Prop → Prop → Prop
 P ⇒ Q = P → Q
@@ -36,10 +31,21 @@ elim∧₁ (x , y) = x
 elim∧₂ : {A B : Prop} → A ∧ B ⇒ B
 elim∧₂ (x , y) = y
 
+intro∧ : {A B : Prop} → A ⇒ B ⇒ (A ∧ B)
+intro∧ = λ x y → (x , y)
+
 _⇔_ : Prop → Prop → Prop
 P ⇔ Q = (P ⇒ Q) ∧ (Q ⇒ P)
 
 infixr 0 _⇔_
+
+data ⊥ : Prop where
+
+elim⊥ : {A : Prop} → ⊥ → A
+elim⊥()
+
+¬ : Prop → Prop
+¬ A = A → ⊥
 
 const : {P Q : Prop} → P ⇒ Q ⇒ P
 const p q = p
@@ -169,11 +175,15 @@ distr (Known f) (Known x) = (Known (f x))
 andK : {A B : Prop} → K (A ∧ B) ⇒ (K A ∧ K B)
 andK (Known (a , b)) = (Known (elim∧₁ (a , b)), Known (elim∧₂ (a , b)))
 
+orProperty : {A B : Prop} → K A ∨ K B ⇒ K (A ∨ B)
+orProperty (intro∨₁ (Known x)) = Known (intro∨₁ x)
+orProperty (intro∨₂ (Known x)) = Known (intro∨₂ x)
+
 hold₁ : {A : Prop} → K A ⇒ K (K A)
 hold₁ (Known x) = Known (Known x)
 
-hold₂ : {A : Prop} → ¬(K A) ⇒ K (¬ (K A))
-hold₂ x = Known x
+hold₂ : {A : Prop} → (¬ (K A)) ⇒ K (¬ (K A))
+hold₂ f = Known f
 
 IELTheorem₁ : {A : Prop} → K A ⇒ ¬ (¬ A)
 IELTheorem₁ (Known x) = double x
@@ -189,11 +199,38 @@ IELTheorem₃ f = f spike
 IELTheorem₄ : {A : Prop} → ¬ (K A ∧ ¬ A)
 IELTheorem₄ (Known x , x₁) = x₁ x
 
-∘-preserveK : {A B C : Prop} → K ((A ⇒ B) ⇒ (B ⇒ C) ⇒ A ⇒ C) ⇒ (K (A ⇒ B) ⇒ K ((B ⇒ C) ⇒ (A ⇒ C)))
-∘-preserveK = distr
+IELTheorem₅ : {A : Prop} → K (¬ A) ⇒ ¬ A
+IELTheorem₅ (Known x) = x
 
-∘-preserveK₁ : {A B C : Prop} → (K (A ⇒ B) ⇒ K ((B ⇒ C) ⇒ (A ⇒ C))) ⇒ (K A ⇒ K B) ⇒ (K B ⇒ K C) ⇒ K A ⇒ K C
-∘-preserveK₁ f g h x = h (g x)
+Help : {A B : Prop} → K (A ⇒ B) ⇒ K A ⇒ B
+Help (Known f) (Known x) = f x
+
+Help₁ : {A B : Prop} → (K A ⇒ B) ⇒ K (A ⇒ B)
+Help₁ f = Known ((λ x → f (Known x))) 
+
+Lemma₁ : {A : Prop} → ¬ (K A) ⇒ K (¬ A)
+Lemma₁ = Help₁
+
+Lemma₂ : {A : Prop} → K (¬ A) ⇒ ¬ (K A)
+Lemma₂ f = Help f
+
+IELTheorem₆ : {A : Prop} → (¬ (K A)) ⇔ K (¬ A)
+IELTheorem₆ = (Lemma₁ , Lemma₂)
+
+IELTheorem₇ : {A : Prop} → ¬ (¬ (K A) ∧ ¬ (K (¬ A)))
+IELTheorem₇ (x , x₁) = x₁ (Lemma₁ x)
+
+KFunctor : {A B : Prop} → (A ⇒ B) ⇒ K A ⇒ K B
+KFunctor f (Known x) = Known (f x)
+
+∘-preserveK₁ : {A B C : Prop} → K ((A ⇒ B) ⇒ (B ⇒ C) ⇒ A ⇒ C) ⇒ (K (A ⇒ B) ⇒ K ((B ⇒ C) ⇒ (A ⇒ C)))
+∘-preserveK₁ = distr
+
+∘-preserveK₂ : {A B C : Prop} → (K (A ⇒ B) ⇒ K ((B ⇒ C) ⇒ (A ⇒ C))) ⇒ (K A ⇒ K B) ⇒ (K B ⇒ K C) ⇒ K A ⇒ K C
+∘-preserveK₂ f g h x = h (g x)
+
+∘-preserveK : {A B C : Prop} → K ((A ⇒ B) ⇒ (B ⇒ C) ⇒ A ⇒ C) ⇒ ((K A ⇒ K B) ⇒ (K B ⇒ K C) ⇒ K A ⇒ K C)
+∘-preserveK = ∘-preserveK₂ ∘ ∘-preserveK₁
 
 1-to-postulate : {A : Prop} → K A ⇒ (¬ (¬ A)) ⇒ ¬ (K ⊥)
 1-to-postulate (Known x) f (Known x₁) = x₁
@@ -211,6 +248,9 @@ record EndoFunctor (F : Set → Set) : Set₁ where
   field
     fmap : ∀ {A B} → (A → B) → F A → F B
 open EndoFunctor {{...}} public
+
+KnownEndoFunctor : EndoFunctor K
+KnownEndoFunctor = record {fmap = KFunctor}
 
 record Applicative (F : Set → Set) : Set₁ where
   infixl 2 _<*>_
